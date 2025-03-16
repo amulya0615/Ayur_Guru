@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics - AyurGuru</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-green-600 text-white py-4 shadow-lg">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">AyurGuru</h1>
+            <p class="text-sm">Discover Your Prakriti Type and Personalized Recommendations</p>
+        </div>
+    </header>
+
+    <nav class="bg-green-600 text-white py-2 shadow-lg">
+        <div class="container mx-auto">
+            <ul class="flex justify-center space-x-4">
+                <li><a href="/" class="block px-4 py-2 hover:bg-green-500">Home</a></li>
+                <li><a href="/about" class="block px-4 py-2 hover:bg-green-500">About the Project</a></li>
+                <li><a href="/vata" class="block px-4 py-2 hover:bg-green-500">Vata</a></li>
+                <li><a href="/pitta" class="block px-4 py-2 hover:bg-green-500">Pitta</a></li>
+                <li><a href="/kapha" class="block px-4 py-2 hover:bg-green-500">Kapha</a></li>
+                <li><a href="/metrics" class="block px-4 py-2 hover:bg-green-500">Metrics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 p-4">
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-2xl font-semibold text-center text-green-600 mb-6">Model Metrics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+                <div>
+                    <canvas id="precisionChart"></canvas>
+                </div>
+                <div>
+                    <canvas id="recallChart"></canvas>
+                </div>
+                <div>
+                    <canvas id="f1ScoreChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function fetchMetrics() {
+            const response = await fetch('/metrics_data');
+            const data = await response.json();
+
+            const accuracyChart = new Chart(document.getElementById('accuracyChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.models,
+                    datasets: [{
+                        label: 'Accuracy',
+                        data: data.accuracy,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const precisionChart = new Chart(document.getElementById('precisionChart'), {
+                type: 'pie',
+                data: {
+                    labels: data.models,
+                    datasets: [{
+                        label: 'Precision',
+                        data: data.precision,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw.toFixed(2);
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const recallChart = new Chart(document.getElementById('recallChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.models,
+                    datasets: [{
+                        label: 'Recall',
+                        data: data.recall,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const f1ScoreChart = new Chart(document.getElementById('f1ScoreChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.models,
+                    datasets: [{
+                        label: 'F1 Score',
+                        data: data.f1_score,
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        fetchMetrics();
+    </script>
+</body>
+</html>

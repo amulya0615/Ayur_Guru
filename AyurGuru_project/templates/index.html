@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurGuru - Prakriti Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-green-600 text-white py-4 shadow-lg">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">AyurGuru</h1>
+            <p class="text-sm">Discover Your Prakriti Type and Personalized Recommendations</p>
+        </div>
+    </header>
+
+    <nav class="bg-green-600 text-white py-2 shadow-lg">
+        <div class="container mx-auto">
+            <ul class="flex justify-center space-x-4">
+                <li><a href="/" class="block px-4 py-2 hover:bg-green-500">Home</a></li>
+                <li><a href="/about" class="block px-4 py-2 hover:bg-green-500">About</a></li>
+                <li><a href="/vata" class="block px-4 py-2 hover:bg-green-500">Vata</a></li>
+                <li><a href="/pitta" class="block px-4 py-2 hover:bg-green-500">Pitta</a></li>
+                <li><a href="/kapha" class="block px-4 py-2 hover:bg-green-500">Kapha</a></li>
+                <li><a href="/metrics" class="block px-4 py-2 hover:bg-green-500">Metrics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 p-4">
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-2xl font-semibold text-center text-green-600 mb-6">Prakriti Predictor</h2>
+            <form id="predictionForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="Gender" class="block text-sm font-medium">Gender:</label>
+                    <select name="Gender" id="Gender" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="eye_Color" class="block text-sm font-medium">Eye Color:</label>
+                    <select name="eye_Color" id="eye_Color" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="DarkBrown">Dark Brown</option>
+                        <option value="LightBrown">Light Brown</option>
+                        <option value="Black">Black</option>
+                        <option value="Grayish">Grayish</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="lips_Color" class="block text-sm font-medium">Lips Color:</label>
+                    <select name="lips_Color" id="lips_Color" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Dark">Dark</option>
+                        <option value="Pink">Pink</option>
+                        <option value="Reddish">Reddish</option>
+                        <option value="PaleYellow">Pale Yellow</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="hair_Color" class="block text-sm font-medium">Hair Color:</label>
+                    <select name="hair_Color" id="hair_Color" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Black">Black</option>
+                        <option value="LightBrown">Light Brown</option>
+                        <option value="DarkBrown">Dark Brown</option>
+                        <option value="Dusky">Dusky</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="skin_Color" class="block text-sm font-medium">Skin Color:</label>
+                    <select name="skin_Color" id="skin_Color" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Whitish">Whitish</option>
+                        <option value="Dark">Dark</option>
+                        <option value="FairPaleYellow">Fair Pale Yellow</option>
+                        <option value="FairReddish">Fair Reddish</option>
+                        <option value="FairPink">Fair Pink</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="skin_Nature" class="block text-sm font-medium">Skin Nature:</label>
+                    <select name="skin_Nature" id="skin_Nature" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Dry">Dry</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Oily">Oily</option>
+                        <option value="Seasonal/Variable">Seasonal/Variable</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sleep_Quality" class="block text-sm font-medium">Sleep Quality:</label>
+                    <select name="sleep_Quality" id="sleep_Quality" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Sound">Sound</option>
+                        <option value="Deep">Deep</option>
+                        <option value="Shallow">Shallow</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Anger_Quality" class="block text-sm font-medium">Anger Quality:</label>
+                    <select name="Anger_Quality" id="Anger_Quality" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Good">Good</option>
+                        <option value="Poor">Poor</option>
+                        <option value="Medium">Medium</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="lips_Nature" class="block text-sm font-medium">Lips Nature:</label>
+                    <select name="lips_Nature" id="lips_Nature" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Cracked">Cracked</option>
+                        <option value="Non_Cracked">Non Cracked</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="skin_pimple" class="block text-sm font-medium">Skin Pimples:</label>
+                    <select name="skin_pimple" id="skin_pimple" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="Pimples">Pimples</option>
+                        <option value="Non_Pimples">Non Pimples</option>
+                    </select>
+                </div>
+            </form>
+            <div class="mt-6 text-center">
+                <button id="predictButton" class="px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-500">Predict Prakriti</button>
+            </div>
+        </section>
+
+        <section id="resultSection" class="mt-8 hidden bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-green-600">Your Prakriti Type:</h2>
+            <p id="prakritiType" class="mt-2 text-gray-700 font-medium"></p>
+            <div id="recommendations" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200"></div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('predictButton').addEventListener('click', async () => {
+            const form = document.getElementById('predictionForm');
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                document.getElementById('prakritiType').textContent = result.prakriti;
+                
+                // Convert Markdown to HTML for better readability
+                const recommendationsHtml = marked.parse(result.recommendations);
+                document.getElementById('recommendations').innerHTML = recommendationsHtml;
+                
+                document.getElementById('resultSection').classList.remove('hidden');
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('Error predicting Prakriti. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>
