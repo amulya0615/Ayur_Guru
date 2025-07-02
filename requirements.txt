@@ -3,5 +3,5 @@ pandas
 scikit-learn
 python-dotenv
 groq
-chart.js
+chartjs
 numpy

@@ -17,9 +17,44 @@
         section {
             margin-bottom: 20px;
         }
+        nav {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            transition: background 0.3s;
+        }
+        nav ul li a:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/vata">Vata</a></li>
+            <li><a href="/pitta">Pitta</a></li>
+            <li><a href="/kapha">Kapha</a></li>
+            <li><a href="/metrics">Metrics</a></li>
+            <li><a href="/ai-doctor" class="block px-4 py-2 hover:bg-blue-500">AI Doctor</a></li>
+        </ul>
+    </nav>
+
     <h1>Pitta Prakriti (Fire and Water Element)</h1>
 
     <section id="overview">

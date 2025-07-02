@@ -121,44 +121,32 @@
             </div>
         </section>
 
-        <section id="resultSection" class="mt-8 hidden bg-white shadow rounded-lg p-6">
-            <h2 class="text-xl font-semibold text-green-600">Your Prakriti Type:</h2>
-            <p id="prakritiType" class="mt-2 text-gray-700 font-medium"></p>
-            <div id="recommendations" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200"></div>
+        <section class="mt-8 bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-green-600">Try our <a href="/ai-doctor" class="underline text-blue-600 hover:text-blue-800">AI Doctor</a> for Ayurvedic advice!</h2>
         </section>
     </main>
 
     <script>
-        document.getElementById('predictButton').addEventListener('click', async () => {
+        document.getElementById('predictButton').addEventListener('click', async (e) => {
+            e.preventDefault();
             const form = document.getElementById('predictionForm');
             const formData = new FormData(form);
-
             const data = {};
             formData.forEach((value, key) => {
                 data[key] = value;
             });
-
             try {
                 const response = await fetch('/predict', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
                 }
-
-                const result = await response.json();
-                document.getElementById('prakritiType').textContent = result.prakriti;
-                
-                // Convert Markdown to HTML for better readability
-                const recommendationsHtml = marked.parse(result.recommendations);
-                document.getElementById('recommendations').innerHTML = recommendationsHtml;
-                
-                document.getElementById('resultSection').classList.remove('hidden');
+                // fallback (should not happen)
+                alert('Unexpected response.');
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
                 alert('Error predicting Prakriti. Please try again later.');

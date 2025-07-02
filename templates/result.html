@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prakriti Report - AyurGuru</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-green-600 text-white py-4 shadow-lg">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">AyurGuru</h1>
+            <p class="text-sm">Your Personalized Prakriti Report</p>
+        </div>
+    </header>
+    <main class="container mx-auto mt-8 p-4">
+        <section class="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-semibold text-center text-green-600 mb-6">Prakriti Prediction Result</h2>
+            <div class="mb-4">
+                <span class="font-semibold">Prakriti Type:</span>
+                <span id="prakritiType" class="text-lg text-green-700 font-bold"></span>
+            </div>
+            <div class="mb-4">
+                <span class="font-semibold">Recommendations:</span>
+                <div id="recommendations" class="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-96 overflow-auto whitespace-pre-line break-words"></div>
+            </div>
+            <button id="downloadReport" class="px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-500 mt-4">Download Report as PDF</button>
+            <div class="mt-6 text-center">
+                <a href="/" class="text-green-600 hover:underline">Back to Home</a>
+            </div>
+        </section>
+    </main>
+    <script>
+        // Populate the result from query params
+        function getQueryParams() {
+            const params = {};
+            window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
+                params[key] = decodeURIComponent(value.replace(/\+/g, ' '));
+            });
+            return params;
+        }
+        const params = getQueryParams();
+        document.getElementById('prakritiType').textContent = params.prakriti || '';
+        // Decode and render markdown as HTML, fallback to plain text if marked fails
+        let recommendationsText = params.recommendations || '';
+        // Remove leading/trailing whitespace and decode
+        recommendationsText = recommendationsText.trim();
+        try {
+            document.getElementById('recommendations').innerHTML = marked.parse(recommendationsText);
+        } catch (e) {
+            document.getElementById('recommendations').textContent = recommendationsText;
+        }
+
+        document.getElementById('downloadReport').addEventListener('click', function() {
+            const jsPDF = window.jspdf.jsPDF;
+            const doc = new jsPDF();
+            // Set title in green
+            doc.setFontSize(18);
+            doc.setTextColor(34, 197, 94); // Tailwind green-600
+            doc.text('AyurGuru Prakriti Report', 10, 15);
+            // Prakriti Type in green
+            doc.setFontSize(14);
+            doc.setTextColor(34, 197, 94);
+            doc.text('Prakriti Type: ' + (params.prakriti || ''), 10, 30);
+            // Recommendations heading in black
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Recommendations:', 10, 45);
+            // Recommendations text in dark gray
+            doc.setFontSize(11);
+            doc.setTextColor(55, 65, 81); // Tailwind gray-700
+            let y = 55;
+            const pageHeight = doc.internal.pageSize.height;
+            const leftMargin = 10;
+            const rightMargin = 200;
+            // Remove markdown formatting for PDF
+            const plainText = recommendationsText.replace(/[*_`#>-]/g, '');
+            const lines = plainText.split('\n');
+            lines.forEach(line => {
+                // Split long lines to fit page width
+                const splitLines = doc.splitTextToSize(line, rightMargin - leftMargin);
+                splitLines.forEach(splitLine => {
+                    if (y > pageHeight - 15) {
+                        doc.addPage();
+                        y = 15;
+                    }
+                    doc.text(splitLine, leftMargin, y);
+                    y += 7;
+                });
+            });
+            doc.save('AyurGuru_Prakriti_Report.pdf');
+        });
+    </script>
+</body>
+</html>

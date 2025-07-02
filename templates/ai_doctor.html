@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Doctor - AyurGuru</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-green-600 text-white py-4 shadow-lg">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold">AyurGuru</h1>
+            <p class="text-sm">AI Doctor - Ask an Ayurvedic Expert</p>
+        </div>
+    </header>
+    <main class="container mx-auto mt-8 p-4">
+        <section class="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-semibold text-center text-green-600 mb-6">AI Doctor Chat</h2>
+            <form id="aiDoctorForm" class="flex flex-col md:flex-row gap-4 mb-4">
+                <input type="text" id="userQuestion" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-green-500 focus:border-green-500" placeholder="Ask your Ayurvedic health question..." required>
+                <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-500">Ask</button>
+            </form>
+            <div id="chatBox" class="bg-gray-50 rounded-lg border border-gray-200 p-4 h-96 overflow-y-auto"></div>
+        </section>
+        <div class="mt-6 text-center">
+            <a href="/" class="text-green-600 hover:underline">Back to Home</a>
+        </div>
+    </main>
+    <script>
+        const form = document.getElementById('aiDoctorForm');
+        const chatBox = document.getElementById('chatBox');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = document.getElementById('userQuestion').value;
+            chatBox.innerHTML += `<div class='mb-2'><span class='font-semibold text-green-700'>You:</span> ${question}</div>`;
+            document.getElementById('userQuestion').value = '';
+            chatBox.innerHTML += `<div class='mb-2 text-gray-500'>AI Doctor is typing...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            try {
+                const response = await fetch('/ai-doctor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+                const data = await response.json();
+                chatBox.innerHTML = chatBox.innerHTML.replace('AI Doctor is typing...', '');
+                chatBox.innerHTML += `<div class='mb-4'><span class='font-semibold text-blue-700'>AI Doctor:</span> ${data.answer}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (err) {
+                chatBox.innerHTML += `<div class='mb-4 text-red-600'>Error: Could not get a response. Please try again.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.model_selection import train_test_split
@@ -21,7 +21,7 @@ groq_client = Groq(api_key=api_key)
 app = Flask(__name__)
 
 # Load the dataset
-df = pd.read_csv(r"C:\Users\FRUITY\Desktop\Ayur_Guru\AyurGuru_project\model\data_filtered.csv")
+df = pd.read_csv("model/data_filtered.csv")
 
 # Initialize label encoders for each categorical column
 encoders = {}
@@ -88,7 +88,6 @@ def predict():
     rf_model = models['Random Forest']
     prediction = rf_model.predict(encoded_df)
 
-    
     # Decode the prediction back to original class name
     predicted_class = encoders['class'].inverse_transform(prediction)[0]
     
@@ -104,10 +103,35 @@ def predict():
     except Exception as e:
         recommendations = f"Failed to fetch recommendations: {str(e)}"
     
-    return jsonify({
+    # Instead of returning JSON, redirect to result page with query params
+    import urllib.parse
+    params = urllib.parse.urlencode({
         'prakriti': predicted_class,
         'recommendations': recommendations
     })
+    return redirect(url_for('result') + '?' + params)
+
+@app.route('/result')
+def result():
+    return render_template('result.html')
+
+@app.route('/ai-doctor', methods=['GET', 'POST'])
+def ai_doctor():
+    if request.method == 'GET':
+        return render_template('ai_doctor.html')
+    if request.method == 'POST':
+        data = request.get_json()
+        question = data.get('question', '')
+        prompt = f"You are an expert Ayurvedic doctor. Answer the following user question in a friendly, clear, and practical way, referencing Ayurvedic principles where relevant. If the question is not related to Ayurveda, politely decline.\n\nUser: {question}\n\nAI Doctor:" 
+        try:
+            chat_completion = groq_client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="llama3-8b-8192",
+            )
+            answer = chat_completion.choices[0].message.content
+        except Exception as e:
+            answer = f"Failed to fetch answer: {str(e)}"
+        return jsonify({'answer': answer})
 
 @app.route('/about')
 def about():
@@ -140,4 +164,4 @@ def metrics_data():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host="0.0.0.0", port=8100)
