@@ -6,6 +6,28 @@
     <title>AyurGuru - Prakriti Predictor</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        #loading-spinner {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px; height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
     <header class="bg-green-600 text-white py-4 shadow-lg">
@@ -115,6 +137,17 @@
                         <option value="Non_Pimples">Non Pimples</option>
                     </select>
                 </div>
+                <!-- Add language dropdown -->
+                <div>
+                    <label for="language" class="block text-sm font-medium">Report Language:</label>
+                    <select name="language" id="language" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <option value="English">English</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Kannada">Kannada</option>
+                    </select>
+                </div>
             </form>
             <div class="mt-6 text-center">
                 <button id="predictButton" class="px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-500">Predict Prakriti</button>
@@ -126,28 +159,48 @@
         </section>
     </main>
 
+    <div id="loading-spinner">
+        <div class="loader"></div>
+        <div style="margin-top:16px;font-size:18px;">Generating your report...</div>
+    </div>
+
     <script>
+        function showLoader() {
+            document.getElementById('loading-spinner').style.display = 'flex';
+        }
+        function hideLoader() {
+            document.getElementById('loading-spinner').style.display = 'none';
+        }
+
         document.getElementById('predictButton').addEventListener('click', async (e) => {
             e.preventDefault();
+            showLoader(); // Show loader immediately on button click
             const form = document.getElementById('predictionForm');
             const formData = new FormData(form);
-            const data = {};
+            const features = {};
+            let language = 'English';
             formData.forEach((value, key) => {
-                data[key] = value;
+                if (key === 'language') {
+                    language = value;
+                } else {
+                    features[key] = value;
+                }
             });
             try {
                 const response = await fetch('/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ features, language })
                 });
                 if (response.redirected) {
                     window.location.href = response.url;
                     return;
                 }
                 // fallback (should not happen)
+                hideLoader();
                 alert('Unexpected response.');
             } catch (error) {
+                hideLoader();
                 console.error('There was a problem with the fetch operation:', error);
                 alert('Error predicting Prakriti. Please try again later.');
             }

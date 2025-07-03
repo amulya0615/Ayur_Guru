@@ -7,16 +7,18 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import pickle
 import os
 from dotenv import load_dotenv
-from groq import Groq
+# from groq import Groq
+import google.generativeai as genai
 
 # Load environment variables
 load_dotenv()
 
-# Initialize Groq client
-api_key = os.getenv("GROQ_API_KEY")
+# Initialize Gemini client
+api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    raise EnvironmentError("GROQ_API_KEY not found in environment variables.")
-groq_client = Groq(api_key=api_key)
+    raise EnvironmentError("GEMINI_API_KEY not found in environment variables.")
+genai.configure(api_key=api_key)
+gemini_model = genai.GenerativeModel("gemini-2.5-flash")
 
 app = Flask(__name__)
 
@@ -68,7 +70,9 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    features = request.get_json()
+    data = request.get_json()
+    features = data.get('features', data)  # backward compatibility if only features sent
+    language = data.get('language', 'English')  # default to English if not provided
     
     # Create a DataFrame with the input features
     input_df = pd.DataFrame([features])
@@ -91,15 +95,15 @@ def predict():
     # Decode the prediction back to original class name
     predicted_class = encoders['class'].inverse_transform(prediction)[0]
     
-    # Generate personalized recommendations using Groq API
-    prompt = f"Generate personalized health and lifestyle recommendations for someone with {predicted_class} prakriti type, considering these characteristics: {features}"
-    
+    # Generate personalized recommendations using Gemini API in selected language
+    prompt = (
+        f"Generate personalized health and lifestyle recommendations for someone with {predicted_class} prakriti type, "
+        f"considering these characteristics: {features}. "
+        f"Please write the report in {language}."
+    )
     try:
-        chat_completion = groq_client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="llama3-8b-8192",
-        )
-        recommendations = chat_completion.choices[0].message.content
+        response = gemini_model.generate_content(prompt)
+        recommendations = response.text
     except Exception as e:
         recommendations = f"Failed to fetch recommendations: {str(e)}"
     
@@ -124,11 +128,8 @@ def ai_doctor():
         question = data.get('question', '')
         prompt = f"You are an expert Ayurvedic doctor. Answer the following user question in a friendly, clear, and practical way, referencing Ayurvedic principles where relevant. If the question is not related to Ayurveda, politely decline.\n\nUser: {question}\n\nAI Doctor:" 
         try:
-            chat_completion = groq_client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
-                model="llama3-8b-8192",
-            )
-            answer = chat_completion.choices[0].message.content
+            response = gemini_model.generate_content(prompt)
+            answer = response.text
         except Exception as e:
             answer = f"Failed to fetch answer: {str(e)}"
         return jsonify({'answer': answer})
